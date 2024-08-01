@@ -1,11 +1,12 @@
-use actix_web::{web, App, HttpServer, HttpResponse, Result, Responder};
+use actix_files::NamedFile;
+use actix_web::{web, App, HttpServer, HttpResponse, Result, Responder, error};
 use actix_multipart::Multipart;
 use futures_util::StreamExt;
 use tokio::io::AsyncWriteExt;
 
 use crate::cv::sobel;
 
-pub async fn apply_filter(mut payload: Multipart) -> impl Responder {
+pub async fn apply_filter(mut payload: Multipart) ->  Result<NamedFile>{
     while let Some(field) = payload.next().await {
         let mut field = field.unwrap();
         let file_name = field
@@ -28,10 +29,8 @@ pub async fn apply_filter(mut payload: Multipart) -> impl Responder {
         // Handle in such a way that as the image is rendered it is sent over to the JS UI
         sobel::sobel_edge_filter(&file_path).unwrap();
 
-        tokio::fs::remove_file(file_path).await.unwrap();
+        return Ok(NamedFile::open("./video/output.mp4")?);
 
     }
-
-
-    HttpResponse::Ok().body("File uploaded successfully")
+    Err(error::ErrorInternalServerError("Failed to open video file").into())
 }

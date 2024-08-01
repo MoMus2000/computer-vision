@@ -37,7 +37,7 @@
         <div class="drop-message">Drop Video Here</div>
     </div>
     <div class="video-box" id="videoBox2">
-        <!-- <div class="drop-message">Drop Video Here</div> -->
+        <div class="drop-message">Drop Video Here</div>
     </div>
 </div>
 
@@ -49,8 +49,8 @@
         if (file && file.type.startsWith('video/')) {
             const videoElement = document.createElement('video');
             videoElement.src = URL.createObjectURL(file);
+            videoElement.id = "b"
             videoElement.controls = true;
-            videoElement.autoplay = true;
             videoBox.innerHTML = ''; // Clear previous content
             videoBox.appendChild(videoElement);
 
@@ -62,10 +62,21 @@
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json())
+            .then(response => response.blob())
             .then(data => {
                 console.log('Success:', data);
+                let videoBox2 = document.getElementById('videoBox2')
+                const videoElement = document.createElement('video');
+                videoElement.src = URL.createObjectURL(data);
+                videoElement.id = "a"
+                videoBox2.innerHTML = ''; // Clear previous content
+                videoElement.controls = true;
+                videoBox2.appendChild(videoElement);
                 // Handle response from the server if needed
+
+                video = document.getElementById('a').play();
+                video = document.getElementById('b').play();
+
             })
             .catch(error => {
                 console.error('Error:', error);
