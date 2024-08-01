@@ -258,22 +258,3 @@ fn process_image(image_path: &str) -> Result<(), Error> {
     }
     Ok(())
 }
-
-fn get_all_files_in_folder(folder_path: &str) -> Result<Vec<String>, Error>{
-    let mut files = Vec::new();
-    
-    for entry in fs::read_dir(folder_path)? {
-        let entry = entry?;
-        let path = entry.path();
-        
-        if path.is_file() {
-            if let Some(file_name) = path.file_name() {
-                if let Some(file_name_str) = file_name.to_str() {
-                    files.push(file_name_str.to_string());
-                }
-            }
-        }
-    }
-    
-    Ok(files)
-}

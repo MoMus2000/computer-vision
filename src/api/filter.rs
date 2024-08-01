@@ -16,7 +16,9 @@ pub async fn apply_filter(mut payload: Multipart) -> impl Responder {
 
         println!("Got the file {}", file_name);
 
-        let mut file = tokio::fs::File::create(&file_name).await.unwrap();
+        let file_path = format!("./video/{}",file_name);
+
+        let mut file = tokio::fs::File::create(&file_path).await.unwrap();
 
         while let Some(chunk) = field.next().await {
             let data = chunk.unwrap();
@@ -24,9 +26,9 @@ pub async fn apply_filter(mut payload: Multipart) -> impl Responder {
         }
 
         // Handle in such a way that as the image is rendered it is sent over to the JS UI
-        sobel::sobel_edge_filter(&file_name).unwrap();
+        sobel::sobel_edge_filter(&file_path).unwrap();
 
-        tokio::fs::remove_file(file_name).await.unwrap();
+        tokio::fs::remove_file(file_path).await.unwrap();
 
     }
 
