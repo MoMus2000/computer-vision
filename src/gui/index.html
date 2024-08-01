@@ -53,6 +53,24 @@
             videoElement.autoplay = true;
             videoBox.innerHTML = ''; // Clear previous content
             videoBox.appendChild(videoElement);
+
+            const formData = new FormData();
+            formData.append('video', file);
+
+            // Send the POST request
+            fetch('/filter', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                // Handle response from the server if needed
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
         } else {
             alert('Please drop a video file.');
         }
