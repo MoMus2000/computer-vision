@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drag and Drop Video Boxes</title>
+    <style>
+        .container {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+        }
+        .video-box {
+            width: 45%;
+            height: 300px;
+            border: 2px dashed #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f9f9f9;
+            position: relative;
+        }
+        .video-box video {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        .drop-message {
+            text-align: center;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="video-box" id="videoBox1">
+        <div class="drop-message">Drop Video Here</div>
+    </div>
+    <div class="video-box" id="videoBox2">
+        <!-- <div class="drop-message">Drop Video Here</div> -->
+    </div>
+</div>
+
+<script>
+    function handleDrop(event) {
+        event.preventDefault();
+        const videoBox = event.currentTarget;
+        const file = event.dataTransfer.files[0];
+        if (file && file.type.startsWith('video/')) {
+            const videoElement = document.createElement('video');
+            videoElement.src = URL.createObjectURL(file);
+            videoElement.controls = true;
+            videoElement.autoplay = true;
+            videoBox.innerHTML = ''; // Clear previous content
+            videoBox.appendChild(videoElement);
+        } else {
+            alert('Please drop a video file.');
+        }
+    }
+
+    function handleDragOver(event) {
+        event.preventDefault();
+    }
+
+    document.getElementById('videoBox1').addEventListener('dragover', handleDragOver);
+    document.getElementById('videoBox1').addEventListener('drop', handleDrop);
+
+</script>
+
+</body>
+</html>
