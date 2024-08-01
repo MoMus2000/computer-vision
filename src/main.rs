@@ -21,39 +21,6 @@ async fn main() -> std::io::Result<()> {
     .await
 }
 
-// fn main() -> Result<(), Error>{
-
-    // let image = CompVision::new("/Users/mmuhammad/Desktop/projects/comp_vision/images/tk.jpeg")?;
-
-    // let image = image.image.blur(2.0);
-
-    // let img = CompVision::box_blur(image.image, 1)?;
-
-    // img.save("/Users/mmuhammad/Desktop/projects/comp_vision/images/test_img3.png")?;
-
-
-    // let kernel = CompVision::create_gaussian_kernel_2d(2, 5.0);
-    // println!("{:?}", kernel);
-
-    // let res = CompVision::gaussian_blur(image.image, 10, 5.0)?;
-    // res.save("/Users/mmuhammad/Desktop/projects/comp_vision/images/test_img5.png")?;
-
-    // let res = CompVision::edge_detection_sobel(image.image)?;
-    // res.save("/Users/mmuhammad/Desktop/projects/comp_vision/images/test_img5.png")?;
-    
-    // let images = get_all_files_in_folder("/Users/mmuhammad/Desktop/projects/comp_vision/images/cycling")?;
-
-    // let pool = ThreadPoolBuilder::new().num_threads(3).build()?;
-    // pool.install(|| {
-    //     images
-    //         .par_iter() // Convert to parallel iterator
-    //         .map(|image_path| process_image(image_path)) // Process each image in parallel
-    //         .collect::<Result<Vec<_>, _>>().unwrap();
-    // });
-
-//     Ok(())
-// }
-
 fn process_image(image_path: &str) -> Result<(), Error> {
     if image_path.contains("png"){
         println!("Processing image {}", image_path);
