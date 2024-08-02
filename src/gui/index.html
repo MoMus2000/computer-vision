@@ -5,45 +5,85 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Drag and Drop Video Boxes</title>
     <style>
-        .container {
-            display: flex;
-            justify-content: space-between;
-            padding: 20px;
-        }
-        .video-box {
-            width: 45%;
-            height: 300px;
-            border: 2px dashed #ccc;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #f9f9f9;
-            position: relative;
-        }
-        .video-box video {
-            max-width: 100%;
-            max-height: 100%;
-        }
-        .drop-message {
-            text-align: center;
-            color: #888;
-        }
+
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .container {
+        display: flex;
+        justify-content: space-between;
+        padding: 20px;
+        width: 80%; /* Adjust as needed */
+    }
+
+    .video-box {
+        width: 45%;
+        height: 300px;
+        border: 2px dashed #ccc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f9f9f9;
+        position: relative;
+    }
+
+    .video-box video {
+        max-width: 100%;
+        max-height: 100%;
+    }
+
+    .drop-message {
+        text-align: center;
+        color: #8886;
+    }
+
+    .loader {
+        border: 16px solid #f3f3f3; /* Light grey */
+        border-top: 16px solid #3498db; /* Blue */
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        animation: spin 2s linear infinite;
+        position: absolute;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="video-box" id="videoBox1">
-        <div class="drop-message">Drop Video Here</div>
+        <label for="filter">Choose a filter:</label>
+        <select id="filter" name="filter">
+            <option value="sobel">Sobel</option>
+            <option value="grayscale">GrayScale</option>
+            <option value="posterize">Posterize</option>
+        </select>
+
+        <br>
+
+    <!-- <div class="loader" style="display: none;"></div> -->
+
+    <div class="container">
+        <div class="video-box" id="videoBox1">
+            <div class="drop-message">Drop File Here</div>
+        </div>
+        <div class="video-box" id="videoBox2">
+            <div class="drop-message"></div>
+        </div>
     </div>
-    <div class="video-box" id="videoBox2">
-        <div class="drop-message">Drop Video Here</div>
-    </div>
-</div>
 
 <script>
     function handleDrop(event) {
         event.preventDefault();
+        // document.querySelector(".loader").style.display = "block";
         const videoBox = event.currentTarget;
         const file = event.dataTransfer.files[0];
         if (file && file.type.startsWith('video/')) {
@@ -56,6 +96,10 @@
 
             const formData = new FormData();
             formData.append('video', file);
+
+            var selectElement = document.getElementById("filter");
+            var selectedValue = selectElement.value;
+            formData.append('filter', selectedValue);
 
             // Send the POST request
             fetch('/filter', {
@@ -73,6 +117,8 @@
                 videoElement.controls = true;
                 videoBox2.appendChild(videoElement);
                 // Handle response from the server if needed
+
+                // document.querySelector(".loader").style.display = "none";
 
                 video = document.getElementById('a').play();
                 video = document.getElementById('b').play();

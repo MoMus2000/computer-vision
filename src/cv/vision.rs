@@ -1,5 +1,4 @@
 use std::f32::consts::PI;
-use std::fs;
 use image::{DynamicImage, GenericImageView, ImageBuffer, ImageReader, Luma, Rgba, Rgb};
 use anyhow::{Error, Ok};
 
@@ -45,7 +44,7 @@ impl CompVision{
         Ok(test_img)
     }
 
-    fn to_grayscale(img: DynamicImage) -> Result<ImageBuffer<Luma<u8>, Vec<u8>>, Error>{
+    pub fn to_grayscale(img: DynamicImage) -> Result<ImageBuffer<Luma<u8>, Vec<u8>>, Error>{
         let (width, height) = img.dimensions();
 
         let mut test_img = image::ImageBuffer::new(width, height);
@@ -55,6 +54,29 @@ impl CompVision{
             let grey = (red*CompVision::RED_GRAY + green*CompVision::GREEN_GRAY + blue*CompVision::BLUE_GRAY) as u8;
             let modified_pixel = image::Luma([grey]);
             test_img.put_pixel(x, y, modified_pixel)
+        }
+
+        Ok(test_img)
+    }
+
+    pub fn posterize(img: DynamicImage, level: usize) -> Result<ImageBuffer<Rgb<u8>, Vec<u8>>, Error>{
+        let (width, height) = img.dimensions();
+
+        let factor = 256 / level as u32;
+
+        let mut test_img = image::ImageBuffer::new(width, height);
+
+        for x in 0.. width {
+            for y in 0 .. height {
+                let pixel = img.get_pixel(x, y);
+
+                let r = ((pixel.0[0] as u32 / factor) * factor) as u8;
+                let g = ((pixel.0[1] as u32 / factor) * factor) as u8;
+                let b = ((pixel.0[2] as u32 / factor) * factor) as u8;
+
+                test_img.put_pixel(x, y, Rgb([r, g, b]));
+
+            }
         }
 
         Ok(test_img)
