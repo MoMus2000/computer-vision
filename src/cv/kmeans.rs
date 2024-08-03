@@ -1,10 +1,9 @@
-
 use crate::cv::{vision, helper};
 use anyhow::Error;
 use std::fs;
 use indicatif::{ProgressBar, ProgressStyle};
 
-pub fn posterize_filter(video_path: &str) -> Result<(), Error>{
+pub fn kmeans_filter(video_path: &str) -> Result<(), Error>{
     helper::to_pictures(video_path)?;
 
     println!("Fetching pics from {} ..", video_path);
@@ -22,7 +21,7 @@ pub fn posterize_filter(video_path: &str) -> Result<(), Error>{
         if pic.contains("png"){
             let image_path = format!("./video/{}", pic);
             let cv = vision::CompVision::new(&image_path)?;
-            let test_img = vision::CompVision::posterize(cv.image, 5).unwrap();
+            let test_img = vision::CompVision::kmeans(cv.image, 10).unwrap();
             test_img.save(image_path)?; 
             pb.inc(1);
         }

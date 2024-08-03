@@ -61,5 +61,9 @@ pub async fn apply_filter(mut payload: Multipart) ->  Result<NamedFile>{
         _ => {}
     }
 
-    return Ok(NamedFile::open("./video/output.mp4")?);
+    let file_to_send = NamedFile::open("./video/output.mp4")?;
+
+    std::fs::remove_file("./video/output.mp4")?;
+
+    return Ok(file_to_send);
 }

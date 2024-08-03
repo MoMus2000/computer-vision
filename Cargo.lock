@@ -524,6 +524,7 @@ dependencies = [
  "futures-util",
  "image",
  "indicatif",
+ "rand",
  "rayon",
  "tokio",
 ]

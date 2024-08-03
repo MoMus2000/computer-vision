@@ -1,6 +1,9 @@
 use std::f32::consts::PI;
 use image::{DynamicImage, GenericImageView, ImageBuffer, ImageReader, Luma, Rgba, Rgb};
 use anyhow::{Error, Ok};
+use rayon::vec;
+use std::collections::HashMap;
+use rand::{thread_rng, Rng};
 
 pub struct CompVision{
     pub image: DynamicImage
@@ -267,6 +270,78 @@ impl CompVision{
     }
 
 
+    pub fn kmeans(img: DynamicImage, palette: usize)-> Result<ImageBuffer<Rgb<u8>, Vec<u8>>, Error> {
+        let (width, height) = img.dimensions();
+        let mut test_img = image::ImageBuffer::new(width, height);
+
+        let mut map : HashMap<Rgba<u8>, usize> = HashMap::new();
+
+        for x in 0 .. width{
+            for y in 0 .. height{
+                let pixel = img.get_pixel(x, y);
+                if map.contains_key(&pixel){
+                    continue;
+                }
+                else{
+                    map.insert(pixel, 1);
+                }
+            }
+        }
+
+        CompVision::create_cluster(map, palette);
+
+        Ok(test_img)
+    }
+
+    fn create_cluster(map: HashMap<Rgba<u8>, usize>, palette: usize){
+        let vectors = CompVision::map_to_vec(map);
+        let centroids = CompVision::initialize_centroids(&vectors, palette);
+        assert_eq!(centroids.len() , palette);
+        for i in 0 .. 10 {
+            let clusters = CompVision::assign_clusters(&centroids, &vectors);
+        }
+    }
+
+    fn assign_clusters(centroids: &Vec<Vec3d>, pixels: &Vec<Vec3d>) -> Vec<usize>{
+        let mut assigned_cluster = vec![0; pixels.len()];
+
+        for (i, data) in pixels.iter().enumerate(){
+            let mut min_dist = f32::MAX;
+            for(j, centroid) in centroids.iter().enumerate(){
+                let dist = data.calcluate_distance(*centroid);
+                if dist < min_dist{
+                    min_dist = dist;
+                    assigned_cluster[i]=j;
+                }
+            }
+        }
+
+        assigned_cluster
+
+    }
+
+    fn update_centroids(data:Vec<Vec3d>, clusters: Vec<Vec3d>, k: usize) {
+    }
+
+    fn map_to_vec(map: HashMap<Rgba<u8>, usize>) -> Vec<Vec3d>{
+        let mut vector = Vec::<Vec3d>::new();
+        for key in map.keys(){
+        let split_pixel = CompVision::split_rbga(*key);
+           vector.push(Vec3d::new(split_pixel.0 as f32, split_pixel.1 as f32, split_pixel.2 as f32));
+        }
+        vector
+    }
+
+    fn initialize_centroids(data: &Vec<Vec3d>, palette: usize) -> Vec<Vec3d>{
+        let mut centroids = Vec::<Vec3d>::new();
+        let mut rng = rand::thread_rng();
+        for _ in 0 .. palette {
+            let index = rng.gen_range(0..data.len());
+            centroids.push(data[index].clone());
+        }
+        centroids
+    }
+
 }
 
 fn process_image(image_path: &str) -> Result<(), Error> {
@@ -279,4 +354,40 @@ fn process_image(image_path: &str) -> Result<(), Error> {
         println!("Done processing image {}", image_path);
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests{
+    use super::CompVision;
+    use anyhow::Error;
+
+
+    #[test]
+    pub fn test_k_means() -> Result<(), Error>{
+        let img = CompVision::new("/Users/mmuhammad/Desktop/8-gTumJhJckqsGlr3.png")?;
+
+        let res = CompVision::kmeans(img.image, 10)?;
+
+        Ok(()) 
+    }
+
+}
+
+
+#[derive(Debug, Clone, Copy)]
+pub struct Vec3d {
+    pub x : f32,
+    pub y : f32,
+    pub z: f32
+}
+
+impl Vec3d{
+    pub fn new(x: f32, y: f32, z: f32) -> Vec3d{
+        Vec3d { x, y, z }
+    }
+
+    pub fn calcluate_distance(&self, vec: Vec3d) -> f32{
+        (self.x + vec.x).powf(2.0) + (self.y + vec.y).powf(2.0) + (self.z+vec.z).powf(2.0).powf(0.5)
+    }
+
 }
